@@ -7,13 +7,13 @@ import { useSelector, useDispatch } from "react-redux";
 function ProductList({ onHomeClick }) {
     const [showCart, setShowCart] = useState(false);
     const [showPlants, setShowPlants] = useState(false); // State to control the visibility of the About Us page
-    const [addedToCart, setAddedToCart] = useState({});
-
 
     const dispatch = useDispatch();
-    // const addedItems = useSelector((state) => state.cart);
-
     const cartItems = useSelector(state => state.cart.items);
+
+    const inTheCart = (plant) => {
+        return cartItems.find(item => item.name === plant.name);
+    }
 
     const plantsArray = [
         {
@@ -266,11 +266,6 @@ function ProductList({ onHomeClick }) {
     const handleAddToCart = (plant) => {
         console.log(`added ${plant.name} to cart`);
         dispatch(addItem(plant));
-
-        setAddedToCart((prevState) => ({
-            ...prevState,
-            [plant.name]: true,
-        }));
     };
 
     const calculateTotalQuantity = () => {
@@ -303,7 +298,18 @@ function ProductList({ onHomeClick }) {
                                 <path d="M42.3,72H221.7l-26.4,92.4A15.9,15.9,0,0,1,179.9,176H84.1a15.9,15.9,0,0,1-15.4-11.6L32.5,37.8A8,8,0,0,0,24.8,32H8" fill="none" stroke="#faf9f9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" id="mainIconPathAttribute">
                                 </path>
                             </svg>
+
                         </h1>
+                        {(
+                            <span style={{
+                                position: 'absolute',  // ← Absolute positioning
+                                top: '32px',          // ← Position relative to parent div
+                                right: '38px',        // ← Position relative to parent div
+                                // ... other styles
+                            }}>
+                                {calculateTotalQuantity()}
+                            </span>
+                        )}
                     </a></div>
                 </div>
             </div>
@@ -327,12 +333,12 @@ function ProductList({ onHomeClick }) {
                                         <div className="product-description">{plant.description}</div> {/* Display plant description */}
                                         <div className="product-cost">{plant.cost}</div> {/* Display plant cost */}
                                         <button
-                                            className={`product-button ${addedToCart[plant.name] === true ? "added-to-cart" : ""}`}
-                                            disabled={addedToCart[plant.name] === true}
+                                            className={`product-button ${inTheCart(plant) ? "added-to-cart" : ""}`}
+                                            disabled={inTheCart(plant)}
                                             onClick={() => handleAddToCart(plant)} // Handle adding plant to cart
                                         >
                                             {
-                                                addedToCart[plant.name] === true ? "Added to Cart" : "Add to Cart"
+                                                inTheCart(plant) ? "Added to Cart" : "Add to Cart"
                                             }
                                         </button>
                                     </div>
